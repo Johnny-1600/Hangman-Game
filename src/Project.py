@@ -18,7 +18,22 @@ small_font = pygame.font.SysFont('arial', 30)
 
 # Function to get a random word
 def get_word():
-    words = ['python', 'hangman', 'computer', 'programming', 'developer', 'algorithm']
+    words = ['python', 'hangman', 'computer', 'programming', 'developer', 'algorithm',
+        'function', 'variable', 'internet', 'keyboard', 'monitor', 'software',
+        'hardware', 'debugging', 'database', 'network', 'compiler', 'syntax',
+        'penguin', 'elephant', 'giraffe', 'kangaroo', 'dolphin', 'tiger',
+        'octopus', 'crocodile', 'rhinoceros', 'flamingo', 'cheetah', 'armadillo',
+        'koala', 'hedgehog', 'squirrel', 'ostrich', 'panther',
+        'mountain', 'river', 'ocean', 'forest', 'volcano', 'desert',
+        'island', 'glacier', 'savanna', 'canyon', 'valley', 'rainforest',
+        'tundra', 'meadow', 'waterfall', 'trees', 'water', 'smoke', 'air',
+        'umbrella', 'backpack', 'notebook', 'puzzle', 'guitar', 'airplane',
+        'rocket','helmet', 'sandwich', 'lantern', 'ladder', 'pillow',
+        'microwave', 'bicycle', 'camera', 'car', 'game', 'keyboard', 'suitcase', 'wallet',
+        'pirate', 'ninja', 'zombie', 'wizard', 'galaxy',
+        'nebula', 'asteroid', 'spaceship', 'universe', 'planet', 'timewarp', 'blackhole',
+        'portal', 'dragon', 'castle', 'magic', 'superhero', 'pumpkin'
+    ]
     return random.choice(words)
 
 # Function to draw the hangman figure
