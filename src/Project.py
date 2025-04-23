@@ -144,8 +144,8 @@ def hangman():
             screen.blit(result_surface, (WIDTH // 2 - result_surface.get_width() // 2, 550))
 
             # Draw buttons
-            play_again_rect = pygame.Rect(WIDTH // 2 - 160, 620, 140, 50)
-            quit_rect = pygame.Rect(WIDTH // 2 + 20, 620, 140, 50)
+            play_again_rect = pygame.Rect(WIDTH // 2 - 180, 620, 180, 60)
+            quit_rect = pygame.Rect(WIDTH // 2 + 20, 620, 180, 60)
 
             pygame.draw.rect(screen, (70, 130, 180), play_again_rect, border_radius=10)
             pygame.draw.rect(screen, (180, 70, 70), quit_rect, border_radius=10)
@@ -158,7 +158,7 @@ def hangman():
             pygame.display.update()
 
             # Wait for click or timeout
-            wait_time = 3000  # 3 seconds
+            wait_time = 10000  # 10 seconds
             timer_start = pygame.time.get_ticks()
             waiting = True
             while waiting:
