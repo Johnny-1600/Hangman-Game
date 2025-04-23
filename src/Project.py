@@ -7,18 +7,32 @@ pygame.init()
 # Game settings
 WIDTH, HEIGHT = 1000, 800
 FPS = 30
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
 
 # Font settings
 font = pygame.font.SysFont('arial', 48)
 small_font = pygame.font.SysFont('arial', 30)
 
-# Function to get a random word
+# Themes
+LIGHT_THEME = {
+    'bg': (255, 255, 255),
+    'text': (0, 0, 0),
+    'hangman': (0, 0, 0),
+    'win': (0, 255, 0),
+    'lose': (255, 0, 0)
+}
+
+DARK_THEME = {
+    'bg': (30, 30, 30),
+    'text': (255, 255, 255),
+    'hangman': (255, 255, 255),
+    'win': (0, 255, 150),
+    'lose': (255, 100, 100)
+}
+
+# Word list
 def get_word():
-    words = ['python', 'hangman', 'computer', 'programming', 'developer', 'algorithm',
+    words = [
+        'python', 'hangman', 'computer', 'programming', 'developer', 'algorithm',
         'function', 'variable', 'internet', 'keyboard', 'monitor', 'software',
         'hardware', 'debugging', 'database', 'network', 'compiler', 'syntax',
         'penguin', 'elephant', 'giraffe', 'kangaroo', 'dolphin', 'tiger',
@@ -36,48 +50,49 @@ def get_word():
     ]
     return random.choice(words)
 
-# Function to draw the hangman figure
-def draw_hangman(screen, tries):
-    # Drawing the base
-    pygame.draw.line(screen, BLACK, (100, 500), (200, 500), 5)  # Base line
-    pygame.draw.line(screen, BLACK, (150, 500), (150, 200), 5)  # Vertical line (post)
-    pygame.draw.line(screen, BLACK, (150, 200), (250, 200), 5)  # Horizontal line (top bar)
-    pygame.draw.line(screen, BLACK, (250, 200), (250, 250), 5)  # Noose
+# Function to draw hangman
+def draw_hangman(screen, tries, color):
+    pygame.draw.line(screen, color, (100, 500), (200, 500), 5)
+    pygame.draw.line(screen, color, (150, 500), (150, 200), 5)
+    pygame.draw.line(screen, color, (150, 200), (250, 200), 5)
+    pygame.draw.line(screen, color, (250, 200), (250, 250), 5)
 
-    # Drawing the hangman based on the number of tries left
     if tries <= 5:
-        pygame.draw.circle(screen, BLACK, (250, 270), 20, 5)  # Head
+        pygame.draw.circle(screen, color, (250, 270), 20, 5)
     if tries <= 4:
-        pygame.draw.line(screen, BLACK, (250, 290), (250, 350), 5)  # Body
+        pygame.draw.line(screen, color, (250, 290), (250, 350), 5)
     if tries <= 3:
-        pygame.draw.line(screen, BLACK, (250, 305), (220, 330), 5)  # Left arm
+        pygame.draw.line(screen, color, (250, 305), (220, 330), 5)
     if tries <= 2:
-        pygame.draw.line(screen, BLACK, (250, 305), (280, 330), 5)  # Right arm
+        pygame.draw.line(screen, color, (250, 305), (280, 330), 5)
     if tries <= 1:
-        pygame.draw.line(screen, BLACK, (250, 350), (220, 395), 5)  # Left leg
+        pygame.draw.line(screen, color, (250, 350), (220, 395), 5)
     if tries == 0:
-        pygame.draw.line(screen, BLACK, (250, 350), (280, 395), 5)  # Right leg
+        pygame.draw.line(screen, color, (250, 350), (280, 395), 5)
 
-# Main game loop
+# Main game function
 def hangman():
-    # Set up the screen
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Hangman Game')
 
-    # Get a random word
     word = get_word()
     guessed_letters = []
     tries = 6
     word_display = ['_'] * len(word)
 
-    # Game loop
+    # Theme state
+    current_theme = LIGHT_THEME
+    button_rect = pygame.Rect(WIDTH - 180, 30, 150, 50)
+    button_color = (80, 80, 80)
+
     running = True
     while running:
-        screen.fill(WHITE)
-        # Handle events
+        screen.fill(current_theme['bg'])
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
             if event.type == pygame.KEYDOWN:
                 guess = pygame.key.name(event.key).lower()
                 if len(guess) == 1 and guess.isalpha():
@@ -90,49 +105,55 @@ def hangman():
                         else:
                             tries -= 1
 
-        # Draw the hangman figure
-        draw_hangman(screen, tries)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_rect.collidepoint(event.pos):
+                    current_theme = DARK_THEME if current_theme == LIGHT_THEME else LIGHT_THEME
 
-        # Draw the word display
+        # Draw hangman
+        draw_hangman(screen, tries, current_theme['hangman'])
+
+        # Draw word
         word_text = ' '.join(word_display)
-        word_surface = font.render(word_text, True, BLACK)
+        word_surface = font.render(word_text, True, current_theme['text'])
         screen.blit(word_surface, (WIDTH // 2 - word_surface.get_width() // 2, 400))
 
-        # Draw guessed letters
+        # Guessed letters
         guessed_text = 'Guessed Letters: ' + ', '.join(guessed_letters)
-        guessed_surface = small_font.render(guessed_text, True, BLACK)
+        guessed_surface = small_font.render(guessed_text, True, current_theme['text'])
         screen.blit(guessed_surface, (50, 50))
 
-        # Display remaining tries
+        # Tries
         tries_text = f'Remaining Tries: {tries}'
-        tries_surface = small_font.render(tries_text, True, RED)
+        tries_surface = small_font.render(tries_text, True, current_theme['lose'])
         screen.blit(tries_surface, (WIDTH // 2 - tries_surface.get_width() // 2, 500))
 
-        # Check if the player has won or lost
+        # Win/Lose messages
         if '_' not in word_display:
             win_text = "Congratulations! You Won!"
-            win_surface = font.render(win_text, True, GREEN)
+            win_surface = font.render(win_text, True, current_theme['win'])
             screen.blit(win_surface, (WIDTH // 2 - win_surface.get_width() // 2, 550))
             pygame.display.update()
-            pygame.time.wait(2000)  # Wait for 2 seconds before quitting
+            pygame.time.wait(2000)
             running = False
 
         if tries == 0:
-            lose_text = f"Game Over! The word was, '{word}'."
-            lose_surface = font.render(lose_text, True, RED)
+            lose_text = f"Game Over! The word was '{word}'."
+            lose_surface = font.render(lose_text, True, current_theme['lose'])
             screen.blit(lose_surface, (WIDTH // 2 - lose_surface.get_width() // 2, 550))
             pygame.display.update()
-            pygame.time.wait(3000)  # Wait for 2 seconds before quitting
+            pygame.time.wait(3000)
             running = False
 
-        # Update the display
-        pygame.display.update()
+        # Draw toggle theme button
+        pygame.draw.rect(screen, button_color, button_rect, border_radius=10)
+        button_text = small_font.render('Toggle Theme', True, (255, 255, 255))
+        screen.blit(button_text, (button_rect.x + 10, button_rect.y + 10))
 
-        # Set the frame rate
+        pygame.display.update()
         pygame.time.Clock().tick(FPS)
 
     pygame.quit()
 
-# Run the game
+# Run game
 if __name__ == '__main__':
     hangman()
