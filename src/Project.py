@@ -82,7 +82,10 @@ def hangman():
 
     # Theme state
     current_theme = LIGHT_THEME
-    button_rect = pygame.Rect(WIDTH - 180, 30, 150, 50)
+    button_width, button_height = 200, 90
+    button_x = WIDTH - button_width - 20
+    button_y = 20
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
     button_color = (80, 80, 80)
 
     running = True
@@ -147,7 +150,8 @@ def hangman():
         # Draw toggle theme button
         pygame.draw.rect(screen, button_color, button_rect, border_radius=10)
         button_text = small_font.render('Toggle Theme', True, (255, 255, 255))
-        screen.blit(button_text, (button_rect.x + 10, button_rect.y + 10))
+        text_rect = button_text.get_rect(center=button_rect.center)
+        screen.blit(button_text, text_rect)
 
         pygame.display.update()
         pygame.time.Clock().tick(FPS)
