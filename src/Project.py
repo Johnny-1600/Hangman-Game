@@ -72,9 +72,11 @@ def draw_hangman(screen, tries, color):
 
 # Main game function
 def hangman():
+    # Set up the screen
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Hangman Game')
 
+    # Get a random word
     word = get_word()
     guessed_letters = []
     tries = 6
@@ -82,12 +84,16 @@ def hangman():
 
     # Theme state
     current_theme = LIGHT_THEME
+
+    # Button settings
     button_width, button_height = 200, 90
     button_x = WIDTH - button_width - 20
     button_y = 20
     button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
     button_color = (80, 80, 80)
 
+
+    # Game loop
     running = True
     while running:
         screen.fill(current_theme['bg'])
@@ -131,21 +137,48 @@ def hangman():
         screen.blit(tries_surface, (WIDTH // 2 - tries_surface.get_width() // 2, 500))
 
         # Win/Lose messages
-        if '_' not in word_display:
-            win_text = "Congratulations! You Won!"
-            win_surface = font.render(win_text, True, current_theme['win'])
-            screen.blit(win_surface, (WIDTH // 2 - win_surface.get_width() // 2, 550))
-            pygame.display.update()
-            pygame.time.wait(2000)
-            running = False
+        if '_' not in word_display or tries == 0:
+            result_text = "Congratulations! You Won!" if '_' not in word_display else f"Game Over! The word was '{word}'."
+            result_color = current_theme['win'] if '_' not in word_display else current_theme['lose']
+            result_surface = font.render(result_text, True, result_color)
+            screen.blit(result_surface, (WIDTH // 2 - result_surface.get_width() // 2, 550))
 
-        if tries == 0:
-            lose_text = f"Game Over! The word was '{word}'."
-            lose_surface = font.render(lose_text, True, current_theme['lose'])
-            screen.blit(lose_surface, (WIDTH // 2 - lose_surface.get_width() // 2, 550))
+            # Draw buttons
+            play_again_rect = pygame.Rect(WIDTH // 2 - 160, 620, 140, 50)
+            quit_rect = pygame.Rect(WIDTH // 2 + 20, 620, 140, 50)
+
+            pygame.draw.rect(screen, (70, 130, 180), play_again_rect, border_radius=10)
+            pygame.draw.rect(screen, (180, 70, 70), quit_rect, border_radius=10)
+
+            play_again_text = small_font.render("Play Again", True, (255, 255, 255))
+            quit_text = small_font.render("Quit", True, (255, 255, 255))
+            screen.blit(play_again_text, play_again_text.get_rect(center=play_again_rect.center))
+            screen.blit(quit_text, quit_text.get_rect(center=quit_rect.center))
+
             pygame.display.update()
-            pygame.time.wait(3000)
-            running = False
+
+            # Wait for click or timeout
+            wait_time = 3000  # 3 seconds
+            timer_start = pygame.time.get_ticks()
+            waiting = True
+            while waiting:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        return
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if play_again_rect.collidepoint(event.pos):
+                            hangman()  # Restart the game
+                            return
+                        if quit_rect.collidepoint(event.pos):
+                            pygame.quit()
+                            return
+
+                # Auto-quit after couple of seconds if no input
+                if pygame.time.get_ticks() - timer_start > wait_time:
+                    pygame.quit()
+                    return
+
 
         # Draw toggle theme button
         pygame.draw.rect(screen, button_color, button_rect, border_radius=10)
