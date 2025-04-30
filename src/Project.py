@@ -78,7 +78,7 @@ def draw_hangman(screen, tries, color):
         pygame.draw.line(screen, color, (250, 350), (280, 395), 5)
 
 # Main game function
-def hangman():
+def hangman(current_theme, color_theme_index):
     # Set up the screen
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Hangman Game')
@@ -89,11 +89,9 @@ def hangman():
     tries = 6
     word_display = ['_'] * len(word)
 
-    # Theme state
-    current_theme = LIGHT_THEME
-    color_theme_index = 0
-    hangman_color = COLOR_THEMES[color_theme_index]['light']['hangman']
-    text_color = COLOR_THEMES[color_theme_index]['light']['text']
+    # Theme and Color state
+    hangman_color = COLOR_THEMES[color_theme_index]['light']['hangman'] if current_theme == LIGHT_THEME else COLOR_THEMES[color_theme_index]['dark']['hangman']
+    text_color = COLOR_THEMES[color_theme_index]['light']['text'] if current_theme == LIGHT_THEME else COLOR_THEMES[color_theme_index]['dark']['text']
 
     # Button settings
     button_width, button_height = 200, 90
@@ -130,21 +128,13 @@ def hangman():
                 if theme_button_rect.collidepoint(event.pos):
                     # Toggle between light and dark theme
                     current_theme = DARK_THEME if current_theme == LIGHT_THEME else LIGHT_THEME
-                    if COLOR_THEMES[color_theme_index]['name'] == 'Default':
-                        text_color = current_theme['text']
-                        hangman_color = current_theme['text']
-                    else:
-                        hangman_color = COLOR_THEMES[color_theme_index]['dark']['hangman'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['hangman']
-                        text_color = COLOR_THEMES[color_theme_index]['dark']['text'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['text']
+                    hangman_color = COLOR_THEMES[color_theme_index]['dark']['hangman'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['hangman']
+                    text_color = COLOR_THEMES[color_theme_index]['dark']['text'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['text']
 
                 if color_button_rect.collidepoint(event.pos):
                     color_theme_index = (color_theme_index + 1) % len(COLOR_THEMES)
-                    if COLOR_THEMES[color_theme_index]['name'] == 'Default':
-                        hangman_color = current_theme['text']
-                        text_color = current_theme['text']
-                    else:
-                        hangman_color = COLOR_THEMES[color_theme_index]['dark']['hangman'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['hangman']
-                        text_color = COLOR_THEMES[color_theme_index]['dark']['text'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['text']
+                    hangman_color = COLOR_THEMES[color_theme_index]['dark']['hangman'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['hangman']
+                    text_color = COLOR_THEMES[color_theme_index]['dark']['text'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['text']
 
         # Draw hangman
         draw_hangman(screen, tries, hangman_color)
@@ -195,7 +185,7 @@ def hangman():
                         return
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if play_again_rect.collidepoint(event.pos):
-                            hangman()  # Restart the game
+                            hangman(current_theme, color_theme_index)  # Restart the game with current settings
                             return
                         if quit_rect.collidepoint(event.pos):
                             pygame.quit()
@@ -224,4 +214,4 @@ def hangman():
 
 # Run game
 if __name__ == '__main__':
-    hangman()
+    hangman(LIGHT_THEME, 0)  # Start with light theme and the first color theme
