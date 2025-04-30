@@ -16,7 +16,6 @@ small_font = pygame.font.SysFont('arial', 30)
 LIGHT_THEME = {
     'bg': (255, 255, 255),
     'text': (0, 0, 0),
-    'hangman': (0, 0, 0),
     'win': (0, 255, 0),
     'lose': (255, 0, 0)
 }
@@ -24,10 +23,18 @@ LIGHT_THEME = {
 DARK_THEME = {
     'bg': (30, 30, 30),
     'text': (255, 255, 255),
-    'hangman': (255, 255, 255),
     'win': (0, 255, 150),
     'lose': (255, 100, 100)
 }
+
+# Color Themes for Hangman and text
+COLOR_THEMES = [
+    {'name': 'Default', 'light': {'hangman': (0, 0, 0), 'text': (0, 0, 0)}, 'dark': {'hangman': (255, 255, 255), 'text': (255, 255, 255)}},
+    {'name': 'Blue', 'light': {'hangman': (0, 120, 255), 'text': (0, 120, 255)}, 'dark': {'hangman': (0, 120, 255), 'text': (0, 120, 255)}},
+    {'name': 'Red', 'light': {'hangman': (200, 30, 30), 'text': (200, 30, 30)}, 'dark': {'hangman': (200, 30, 30), 'text': (200, 30, 30)}},
+    {'name': 'Green', 'light': {'hangman': (30, 200, 100), 'text': (30, 200, 100)}, 'dark': {'hangman': (30, 200, 100), 'text': (30, 200, 100)}},
+    {'name': 'Yellow', 'light': {'hangman': (255, 215, 0), 'text': (255, 215, 0)}, 'dark': {'hangman': (255, 215, 0), 'text': (255, 215, 0)}}
+]
 
 # Word list
 def get_word():
@@ -84,14 +91,19 @@ def hangman():
 
     # Theme state
     current_theme = LIGHT_THEME
+    color_theme_index = 0
+    hangman_color = COLOR_THEMES[color_theme_index]['light']['hangman']
+    text_color = COLOR_THEMES[color_theme_index]['light']['text']
 
     # Button settings
     button_width, button_height = 200, 90
-    button_x = WIDTH - button_width - 20
-    button_y = 20
-    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
     button_color = (80, 80, 80)
 
+    # Theme toggle button
+    theme_button_rect = pygame.Rect(WIDTH - button_width - 20, 20, button_width, button_height)
+
+    # Color theme button
+    color_button_rect = pygame.Rect(WIDTH - button_width - 20, 130, button_width, button_height)
 
     # Game loop
     running = True
@@ -115,32 +127,46 @@ def hangman():
                             tries -= 1
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if button_rect.collidepoint(event.pos):
-                    current_theme = DARK_THEME if current_theme == LIGHT_THEME else LIGHT_THEME
+                if theme_button_rect.collidepoint(event.pos):
+                    # Toggle between light and dark theme
+                    if current_theme == LIGHT_THEME:
+                        current_theme = DARK_THEME
+                        text_color = DARK_THEME['text']  # Set text color to white in dark mode
+                    else:
+                        current_theme = LIGHT_THEME
+                        text_color = LIGHT_THEME['text']  # Set text color to black in light mode
+
+                if color_button_rect.collidepoint(event.pos):
+                    color_theme_index = (color_theme_index + 1) % len(COLOR_THEMES)
+                    if current_theme == LIGHT_THEME:
+                        hangman_color = COLOR_THEMES[color_theme_index]['light']['hangman']
+                        text_color = COLOR_THEMES[color_theme_index]['light']['text']
+                    else:
+                        hangman_color = COLOR_THEMES[color_theme_index]['dark']['hangman']
+                        text_color = COLOR_THEMES[color_theme_index]['dark']['text']
 
         # Draw hangman
-        draw_hangman(screen, tries, current_theme['hangman'])
+        draw_hangman(screen, tries, hangman_color)
 
         # Draw word
         word_text = ' '.join(word_display)
-        word_surface = font.render(word_text, True, current_theme['text'])
+        word_surface = font.render(word_text, True, text_color)
         screen.blit(word_surface, (WIDTH // 2 - word_surface.get_width() // 2, 400))
 
         # Guessed letters
         guessed_text = 'Guessed Letters: ' + ', '.join(guessed_letters)
-        guessed_surface = small_font.render(guessed_text, True, current_theme['text'])
+        guessed_surface = small_font.render(guessed_text, True, text_color)
         screen.blit(guessed_surface, (50, 50))
 
         # Tries
         tries_text = f'Remaining Tries: {tries}'
-        tries_surface = small_font.render(tries_text, True, current_theme['lose'])
+        tries_surface = small_font.render(tries_text, True, text_color)
         screen.blit(tries_surface, (WIDTH // 2 - tries_surface.get_width() // 2, 500))
 
         # Win/Lose messages
         if '_' not in word_display or tries == 0:
             result_text = "Congratulations! You Won!" if '_' not in word_display else f"Game Over! The word was '{word}'."
-            result_color = current_theme['win'] if '_' not in word_display else current_theme['lose']
-            result_surface = font.render(result_text, True, result_color)
+            result_surface = font.render(result_text, True, text_color)
             screen.blit(result_surface, (WIDTH // 2 - result_surface.get_width() // 2, 550))
 
             # Draw buttons
@@ -179,12 +205,16 @@ def hangman():
                     pygame.quit()
                     return
 
+        # Draw theme toggle button
+        pygame.draw.rect(screen, button_color, theme_button_rect, border_radius=10)
+        theme_text = small_font.render('Toggle Theme', True, (255, 255, 255))
+        screen.blit(theme_text, theme_text.get_rect(center=theme_button_rect.center))
 
-        # Draw toggle theme button
-        pygame.draw.rect(screen, button_color, button_rect, border_radius=10)
-        button_text = small_font.render('Toggle Theme', True, (255, 255, 255))
-        text_rect = button_text.get_rect(center=button_rect.center)
-        screen.blit(button_text, text_rect)
+        # Draw color theme button
+        pygame.draw.rect(screen, button_color, color_button_rect, border_radius=10)
+        color_label = f"Color: {COLOR_THEMES[color_theme_index]['name']}"
+        color_text_render = small_font.render(color_label, True, (255, 255, 255))
+        screen.blit(color_text_render, color_text_render.get_rect(center=color_button_rect.center))
 
         pygame.display.update()
         pygame.time.Clock().tick(FPS)
