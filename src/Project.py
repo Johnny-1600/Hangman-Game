@@ -1,43 +1,46 @@
 import pygame
 import random
 
-# Initialize Pygame
-pygame.init()
+# Game Layout
+def initialize_game():
+    pygame.init()
 
-# Game settings
-WIDTH, HEIGHT = 1000, 800
-FPS = 30
-BORDER_WIDTH = 10
+    # Game Settings
+    WIDTH, HEIGHT = 1000, 800
+    FPS = 30
+    BORDER_WIDTH = 10
 
-# Font settings
-font = pygame.font.SysFont('arial', 48)
-small_font = pygame.font.SysFont('arial', 30)
+    # Font Settings
+    font = pygame.font.SysFont('arial', 48)
+    small_font = pygame.font.SysFont('arial', 30)
 
-# Themes
-LIGHT_THEME = {
-    'bg': (255, 255, 255),
-    'text': (0, 0, 0),
-    'win': (0, 255, 0),
-    'lose': (255, 0, 0)
-}
+    # Themes
+    LIGHT_THEME = {
+        'bg': (255, 255, 255),
+        'text': (0, 0, 0),
+        'win': (0, 255, 0),
+        'lose': (255, 0, 0)
+    }
 
-DARK_THEME = {
-    'bg': (30, 30, 30),
-    'text': (255, 255, 255),
-    'win': (0, 255, 150),
-    'lose': (255, 100, 100)
-}
+    DARK_THEME = {
+        'bg': (30, 30, 30),
+        'text': (255, 255, 255),
+        'win': (0, 255, 150),
+        'lose': (255, 100, 100)
+    }
 
-# Color Themes for Hangman and text
-COLOR_THEMES = [
-    {'name': 'Default', 'light': {'hangman': (0, 0, 0), 'text': (0, 0, 0)}, 'dark': {'hangman': (255, 255, 255), 'text': (255, 255, 255)}},
-    {'name': 'Blue', 'light': {'hangman': (0, 120, 255), 'text': (0, 120, 255)}, 'dark': {'hangman': (0, 120, 255), 'text': (0, 120, 255)}},
-    {'name': 'Red', 'light': {'hangman': (200, 30, 30), 'text': (200, 30, 30)}, 'dark': {'hangman': (200, 30, 30), 'text': (200, 30, 30)}},
-    {'name': 'Green', 'light': {'hangman': (30, 200, 100), 'text': (30, 200, 100)}, 'dark': {'hangman': (30, 200, 100), 'text': (30, 200, 100)}},
-    {'name': 'Yellow', 'light': {'hangman': (255, 215, 0), 'text': (255, 215, 0)}, 'dark': {'hangman': (255, 215, 0), 'text': (255, 215, 0)}}
-]
+    # Color Themes
+    COLOR_THEMES = [
+        {'name': 'Default', 'light': {'hangman': (0, 0, 0), 'text': (0, 0, 0)}, 'dark': {'hangman': (255, 255, 255), 'text': (255, 255, 255)}},
+        {'name': 'Blue', 'light': {'hangman': (0, 120, 255), 'text': (0, 120, 255)}, 'dark': {'hangman': (0, 120, 255), 'text': (0, 120, 255)}},
+        {'name': 'Red', 'light': {'hangman': (200, 30, 30), 'text': (200, 30, 30)}, 'dark': {'hangman': (200, 30, 30), 'text': (200, 30, 30)}},
+        {'name': 'Green', 'light': {'hangman': (30, 200, 100), 'text': (30, 200, 100)}, 'dark': {'hangman': (30, 200, 100), 'text': (30, 200, 100)}},
+        {'name': 'Yellow', 'light': {'hangman': (255, 215, 0), 'text': (255, 215, 0)}, 'dark': {'hangman': (255, 215, 0), 'text': (255, 215, 0)}}
+    ]
 
-# Word list
+    return WIDTH, HEIGHT, FPS, BORDER_WIDTH, font, small_font, LIGHT_THEME, DARK_THEME, COLOR_THEMES
+
+# Word List
 def get_word():
     words = [
         'python', 'hangman', 'computer', 'programming', 'developer', 'algorithm',
@@ -84,7 +87,8 @@ def draw_hangman(screen, tries, color):
 
 # Main game function
 def hangman(current_theme, color_theme_index):
-    # Set up the screen
+    # Set Screen
+    WIDTH, HEIGHT, FPS, BORDER_WIDTH, font, small_font, LIGHT_THEME, DARK_THEME, COLOR_THEMES = initialize_game()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Hangman Game')
 
@@ -99,7 +103,7 @@ def hangman(current_theme, color_theme_index):
     hangman_color = COLOR_THEMES[color_theme_index]['light']['hangman'] if current_theme == LIGHT_THEME else COLOR_THEMES[color_theme_index]['dark']['hangman']
     text_color = COLOR_THEMES[color_theme_index]['light']['text'] if current_theme == LIGHT_THEME else COLOR_THEMES[color_theme_index]['dark']['text']
 
-    # Button settings
+    # Button Settings
     button_width, button_height = 200, 90
     button_color = (80, 80, 80)
 
@@ -110,13 +114,13 @@ def hangman(current_theme, color_theme_index):
     color_button_rect = pygame.Rect(WIDTH - button_width - 20, 130, button_width, button_height)
     hint_button_rect = pygame.Rect(WIDTH // 2 + 200, 500, 100, 50)
 
-    # Game loop
+    clock = pygame.time.Clock()
     running = True
     while running:
         screen.fill(current_theme['bg'])
-        
+
         # Draw a border
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, WIDTH, HEIGHT), BORDER_WIDTH)  # Black border
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, WIDTH, HEIGHT), BORDER_WIDTH)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -235,10 +239,11 @@ def hangman(current_theme, color_theme_index):
         screen.blit(color_text_render, color_text_render.get_rect(center=color_button_rect.center))
 
         pygame.display.update()
-        pygame.time.Clock().tick(FPS)
+        clock.tick(FPS)
 
     pygame.quit()
 
 # Run game
 if __name__ == '__main__':
+    WIDTH, HEIGHT, FPS, BORDER_WIDTH, font, small_font, LIGHT_THEME, DARK_THEME, COLOR_THEMES = initialize_game()
     hangman(LIGHT_THEME, 0)
