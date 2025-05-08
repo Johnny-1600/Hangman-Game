@@ -88,6 +88,7 @@ def hangman(current_theme, color_theme_index):
     guessed_letters = []
     tries = 6
     word_display = ['_'] * len(word)
+    hint_used = False
 
     # Theme and Color state
     hangman_color = COLOR_THEMES[color_theme_index]['light']['hangman'] if current_theme == LIGHT_THEME else COLOR_THEMES[color_theme_index]['dark']['hangman']
@@ -100,8 +101,9 @@ def hangman(current_theme, color_theme_index):
     # Theme toggle button
     theme_button_rect = pygame.Rect(WIDTH - button_width - 20, 20, button_width, button_height)
 
-    # Color theme button
+    # Color theme button and hint button
     color_button_rect = pygame.Rect(WIDTH - button_width - 20, 130, button_width, button_height)
+    hint_button_rect = pygame.Rect(WIDTH // 2 + 200, 500, 100, 50)
 
     # Game loop
     running = True
@@ -136,6 +138,17 @@ def hangman(current_theme, color_theme_index):
                     hangman_color = COLOR_THEMES[color_theme_index]['dark']['hangman'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['hangman']
                     text_color = COLOR_THEMES[color_theme_index]['dark']['text'] if current_theme == DARK_THEME else COLOR_THEMES[color_theme_index]['light']['text']
 
+                if hint_button_rect.collidepoint(event.pos) and not hint_used and '_' in word_display:
+                    unrevealed = [i for i, l in enumerate(word) if word_display[i] == '_']
+                    if unrevealed:
+                        index = random.choice(unrevealed)
+                        letter = word[index]
+                        for i in range(len(word)):
+                            if word[i] == letter:
+                                word_display[i] = letter
+                        guessed_letters.append(letter)
+                        hint_used = True
+
         # Draw hangman
         draw_hangman(screen, tries, hangman_color)
 
@@ -153,6 +166,12 @@ def hangman(current_theme, color_theme_index):
         tries_text = f'Remaining Tries: {tries}'
         tries_surface = small_font.render(tries_text, True, text_color)
         screen.blit(tries_surface, (WIDTH // 2 - tries_surface.get_width() // 2, 500))
+
+        # Hint button
+        pygame.draw.rect(screen, (100, 160, 100), hint_button_rect, border_radius=8)
+        hint_label = "Hint" if not hint_used else "Used"
+        hint_text = small_font.render(hint_label, True, (255, 255, 255))
+        screen.blit(hint_text, hint_text.get_rect(center=hint_button_rect.center))
 
         # Win/Lose messages
         if '_' not in word_display or tries == 0:
@@ -214,4 +233,4 @@ def hangman(current_theme, color_theme_index):
 
 # Run game
 if __name__ == '__main__':
-    hangman(LIGHT_THEME, 0)  # Start with light theme and the first color theme
+    hangman(LIGHT_THEME, 0)
