@@ -1,7 +1,7 @@
 # Hang-Man Game
 
 ## Demo
-Demo Video: [<URL>](https://youtu.be/3WdmvHjqfts)
+Demo Video: https://youtu.be/3WdmvHjqfts
 
 ## GitHub Repository
 GitHub Repo: https://github.com/Johnny-1600/Hangman-Game.git
