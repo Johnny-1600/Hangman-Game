@@ -59,11 +59,15 @@ def get_word():
 
 # Function to draw hangman
 def draw_hangman(screen, tries, color):
-    pygame.draw.line(screen, color, (100, 500), (200, 500), 5)
-    pygame.draw.line(screen, color, (150, 500), (150, 200), 5)
-    pygame.draw.line(screen, color, (150, 200), (250, 200), 5)
-    pygame.draw.line(screen, color, (250, 200), (250, 250), 5)
+    pygame.draw.rect(screen, color, pygame.Rect(120, 480, 160, 15))
+    pygame.draw.rect(screen, color, pygame.Rect(140, 460, 40, 20))
+    pygame.draw.rect(screen, color, pygame.Rect(180, 460, 40, 20))
+    pygame.draw.line(screen, color, (150, 460), (150, 200), 8)
+    pygame.draw.line(screen, color, (150, 200), (250, 200), 8)
+    pygame.draw.circle(screen, color, (250, 200), 8)
 
+    if tries <= 5:
+        pygame.draw.line(screen, color, (250, 210), (250, 250), 5)
     if tries <= 5:
         pygame.draw.circle(screen, color, (250, 270), 20, 5)
     if tries <= 4:
