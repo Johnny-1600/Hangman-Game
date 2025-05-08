@@ -7,6 +7,7 @@ pygame.init()
 # Game settings
 WIDTH, HEIGHT = 1000, 800
 FPS = 30
+BORDER_WIDTH = 10
 
 # Font settings
 font = pygame.font.SysFont('arial', 48)
@@ -113,6 +114,9 @@ def hangman(current_theme, color_theme_index):
     running = True
     while running:
         screen.fill(current_theme['bg'])
+        
+        # Draw a border
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, WIDTH, HEIGHT), BORDER_WIDTH)  # Black border
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
